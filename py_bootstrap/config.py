@@ -40,6 +40,7 @@ def init_arg(name, default):
 
 
 profile = init_arg('profile', 'prod')
+extra_profiles = init_arg('extra_profiles', '')
 ip = init_arg('ip', get_host_ip())
 port = init_arg('port', 5000)
 
@@ -55,8 +56,8 @@ eureka = EurekaClient(app_name=app_name, port=port, ip_addr=ip,
 config_app = eureka.get_app(config_server_name)
 config_instances = config_app['application']['instance']
 config_instance = random.choice(config_instances)
-url = '{homepage}{app_name}-{profile}.json'.format(
-    homepage=config_instance['homePageUrl'], app_name=app_name, profile=profile)
+url = '{homepage}{app_name}-{profile}{extra_profiles}.json'.format(
+    homepage=config_instance['homePageUrl'], app_name=app_name, profile=profile,extra_profiles=f'-{extra_profiles}' if extra_profiles else '')
 
 settings = requests.get(url).json()
 config.update(settings)
