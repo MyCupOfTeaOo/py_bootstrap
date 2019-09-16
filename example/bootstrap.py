@@ -13,3 +13,4 @@ config_server_name = os.getenv(
 eureka_url = os.getenv('eureka_url', 'http://192.168.117.102:8108')
 register = os.getenv('register', True)  # 是否注册到eureka
 profile = 'prod'
+extra_profiles = 'database'
