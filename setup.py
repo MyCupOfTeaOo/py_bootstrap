@@ -15,6 +15,7 @@ setup(
     description=(
         'python端启动器'
     ),
+    long_description_content_type="text/markdown",
     long_description=open('README.md', encoding='utf-8').read(),
     author='zouwendi',
     author_email='tz310200@gamil.com',
@@ -23,13 +24,12 @@ setup(
     license='GPL3 License',
     packages=find_packages(),
     platforms=["all"],
-    url='http://192.168.117.144/cetc28/spiderStructFrameWork',
+    url='http://192.168.117.144/microservice/springcloudinfrastructure/py_bootstrap',
     install_requires=reqs,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GPL3 License',
         'Programming Language :: Python',
         'Programming Language :: Python :: Implementation',
         'Programming Language :: Python :: 3',
