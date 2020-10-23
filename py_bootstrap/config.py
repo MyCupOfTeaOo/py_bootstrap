@@ -83,7 +83,7 @@ def register_eureka():
                 log.debug('eureka renew')
                 continue
             except:
-                print('连不上eureka')
+                print(f'连不上eureka: {eureka_url}')
                 traceback.print_exc()
             break
         register_eureka()
