@@ -1,17 +1,18 @@
+import atexit
+import inspect
+import json
+import logging
+import random
 import re
 import threading
 import time
-from qg_tool.tool import get_host_ip
-import json
-from qg_eureka import EurekaClient
-import random
-from importlib import import_module
 import traceback
-import os
-import inspect
-import logging
+from importlib import import_module
+
 import requests
-import atexit
+from qg_eureka import EurekaClient
+from qg_tool.tool import get_host_ip
+
 from .log import init_log
 
 log = logging.getLogger('bootstrap')
@@ -51,17 +52,17 @@ port = init_arg('port', 5000)
 config_server_name = config['config_server_name']
 app_name = config['app_name']
 eureka_url = config['eureka_url']
-
+eureka_heart = config['eureka_heart']
 
 eureka = EurekaClient(app_name=app_name, port=port, ip_addr=ip,
                       eureka_url=eureka_url)
-
 
 config_app = eureka.get_app(config_server_name)
 config_instances = config_app['application']['instance']
 config_instance = random.choice(config_instances)
 url = '{homepage}{app_name}-{profile}{extra_profiles}.json'.format(
-    homepage=config_instance['homePageUrl'], app_name=app_name, profile=profile, extra_profiles=f',{extra_profiles}' if extra_profiles else '')
+    homepage=config_instance['homePageUrl'], app_name=app_name, profile=profile,
+    extra_profiles=f',{extra_profiles}' if extra_profiles else '')
 
 settings = requests.get(url).json()
 config.update(settings)
@@ -72,12 +73,9 @@ print('加载配置成功')
 
 
 def register_eureka():
-    eureka.register()
-    atexit.register(lambda: eureka.deregister())
-
     def heart():
         while True:
-            time.sleep(config.get('eureka_heart', 20))
+            time.sleep(int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
             try:
                 eureka.renew()
                 log.debug('eureka renew')
@@ -85,11 +83,20 @@ def register_eureka():
             except:
                 print(f'连不上eureka: {eureka_url}')
                 traceback.print_exc()
-            break
+            finally:
+                break
         register_eureka()
-    heart_thread = threading.Thread(target=heart)
-    heart_thread.setDaemon(True)
-    heart_thread.start()
+
+    try:
+        eureka.register()
+        atexit.register(lambda: eureka.deregister())
+
+    except:
+        traceback.print_exc()
+    finally:
+        heart_thread = threading.Thread(target=heart)
+        heart_thread.setDaemon(True)
+        heart_thread.start()
 
 
 def get_app_homepage(name, **kwargs):
