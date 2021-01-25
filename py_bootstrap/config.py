@@ -13,8 +13,6 @@ import requests
 from qg_eureka import EurekaClient
 from qg_tool.tool import get_host_ip
 
-from .log import init_log
-
 log = logging.getLogger('bootstrap')
 
 
@@ -109,6 +107,5 @@ def get_app_homepage(name, **kwargs):
     return config_instance['homePageUrl']
 
 
-init_log()
 if config.get('register', False):
     register_eureka()

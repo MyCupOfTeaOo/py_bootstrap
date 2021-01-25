@@ -1,8 +1,8 @@
-qg_eureka>=0.0.1
-colorama>=0.4.3
-pipreqs>=0.4.9
-requests>=2.24.0
-python_logstash>=0.4.6
-setuptools>=41.0.1
-termcolor>=1.1.0
+qg_common_sdk>=1.0.6
 qg_tool>=0.0.2
+qg_eureka>=0.0.1
+termcolor>=1.1.0
+requests>=2.25.1
+colorama>=0.4.3
+python_logstash>=0.4.6
+pipreqs>=0.4.10
