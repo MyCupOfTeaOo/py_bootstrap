@@ -33,7 +33,7 @@ for member in inspect.getmembers(bootstrap, is_config):
 
 
 def init_arg(name, default):
-    if config.get(name, None):
+    if config.get(name, None) is None:
         pass
     else:
         config[name] = default
