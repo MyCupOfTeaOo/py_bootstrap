@@ -410,3 +410,5 @@ _Pvt_Extensions
 *.bak
 *.pyc
 *.log
+py_bootstrap.egg-info
+dist
