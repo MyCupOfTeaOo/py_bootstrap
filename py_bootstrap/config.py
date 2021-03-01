@@ -7,6 +7,7 @@ import re
 import threading
 import time
 import traceback
+import sys
 from importlib import import_module
 
 import requests
@@ -39,7 +40,7 @@ def init_arg(name, default):
     return config[name]
 
 
-profile = init_arg('profile', 'prod')
+profile = init_arg('profile', 'dev' if '--debug' in sys.argv else 'prod')
 extra_profiles = init_arg('extra_profiles', 'logger')
 if not re.search(r'(^|(?<=,))logger($|(?=,))', extra_profiles):
     extra_profiles = extra_profiles + ',logger'
@@ -73,7 +74,8 @@ print('加载配置成功')
 def register_eureka():
     def heart():
         while True:
-            time.sleep(int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
+            time.sleep(
+                int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
             try:
                 eureka.renew()
                 log.debug('eureka renew')
