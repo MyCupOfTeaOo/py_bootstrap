@@ -47,6 +47,7 @@ if not re.search(r'(^|(?<=,))logger($|(?=,))', extra_profiles):
     config.update(extra_profiles=extra_profiles)
 ip = init_arg('ip', get_host_ip())
 port = init_arg('port', 5000)
+auto_load = init_arg('auto_load', True)
 
 config_server_name = config['config_server_name']
 app_name = config['app_name']
@@ -96,6 +97,8 @@ def get_app_homepage(name, **kwargs):
 
 
 def load_config():
+    start = time.time()
+    print('加载配置中...')
     config_app = eureka.get_app(config_server_name)
     config_instances = config_app['application']['instance']
     config_instance = random.choice(config_instances)
@@ -109,6 +112,12 @@ def load_config():
         f.write(json.dumps(config, ensure_ascii=False,
                            indent=4, separators=(',', ':')))
 
-    print('加载配置成功')
+    end = time.time()
+
+    print('加载配置成功,耗时 %.2f s' % (end - start))
     if config.get('register', False):
         register_eureka()
+
+
+if auto_load:
+    load_config()
