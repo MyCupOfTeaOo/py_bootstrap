@@ -58,6 +58,9 @@ eureka = EurekaClient(app_name=app_name, port=port, ip_addr=ip,
                       eureka_url=eureka_url)
 
 
+is_fail = False
+
+
 def register_eureka():
     def heart():
         while True:
@@ -65,11 +68,15 @@ def register_eureka():
                 int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
             try:
                 eureka.renew()
+                if is_fail:
+                    log.info("eureka连接恢复")
+                    is_fail = False
                 log.debug('eureka renew')
                 continue
             except:
-                print(f'连不上eureka: {eureka_url}')
-                traceback.print_exc()
+                log.warning(f'连不上eureka: {eureka_url}')
+                is_fail = True
+                log.error(traceback.format_exc())
             finally:
                 break
         register_eureka()
@@ -77,13 +84,12 @@ def register_eureka():
     try:
         eureka.register()
         atexit.register(lambda: eureka.deregister())
-
     except:
-        traceback.print_exc()
-    finally:
-        heart_thread = threading.Thread(target=heart)
-        heart_thread.setDaemon(True)
-        heart_thread.start()
+        log.error(traceback.format_exc())
+        register_eureka()
+        return
+    heart_thread = threading.Thread(target=heart, daemon=True)
+    heart_thread.start()
 
 
 def get_app_homepage(name, **kwargs):
