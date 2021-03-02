@@ -63,6 +63,7 @@ is_fail = False
 
 def register_eureka():
     def heart():
+        global is_fail
         while True:
             time.sleep(
                 int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
