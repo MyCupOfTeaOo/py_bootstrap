@@ -24,7 +24,7 @@ setup(
     license='GPL3 License',
     packages=find_packages(),
     platforms=["all"],
-    url='http://192.168.117.144/microservice/springcloudinfrastructure/py_bootstrap',
+    url='https://github.com/MyCupOfTeaOo/py_bootstrap',
     install_requires=reqs,
     classifiers=[
         'Development Status :: 4 - Beta',
