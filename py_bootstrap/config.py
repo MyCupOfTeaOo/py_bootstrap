@@ -59,12 +59,20 @@ eureka = EurekaClient(app_name=app_name, port=port, ip_addr=ip,
 
 
 is_fail = False
+stop = False
 
 
 def register_eureka():
+
+    def deregister():
+        global stop
+        stop = True
+        eureka.deregister()
+
     def heart():
         global is_fail
-        while True:
+        global stop
+        while not stop:
             time.sleep(
                 int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
             try:
@@ -80,11 +88,13 @@ def register_eureka():
                 log.error(traceback.format_exc())
             finally:
                 break
-        register_eureka()
+        if not stop:
+            atexit.unregister(deregister)
+            register_eureka()
 
     try:
         eureka.register()
-        atexit.register(lambda: eureka.deregister())
+        atexit.register(deregister)
     except:
         log.error(traceback.format_exc())
         register_eureka()
