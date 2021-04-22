@@ -52,8 +52,6 @@ auto_load = init_arg('auto_load', True)
 config_server_name = config['config_server_name']
 app_name = config['app_name']
 eureka_url = config['eureka_url']
-eureka_heart = config['eureka_heart']
-
 eureka = EurekaClient(app_name=app_name, port=port, ip_addr=ip,
                       eureka_url=eureka_url)
 
@@ -63,6 +61,8 @@ stop = False
 
 
 def register_eureka():
+    eureka_heart = config.get("eureka_heart", 20)
+    eureka_restart_time = config.get("eureka_restart_time", 15)
 
     def deregister():
         global stop
@@ -73,34 +73,36 @@ def register_eureka():
         global is_fail
         global stop
         while not stop:
-            time.sleep(
-                int(eureka_heart) if eureka_heart is not None and eureka_heart != '' else 20)
             try:
                 eureka.renew()
                 if is_fail:
                     log.info("eureka连接恢复")
                     is_fail = False
                 log.debug('eureka renew')
-                continue
             except:
-                log.warning(f'连不上eureka: {eureka_url}')
                 is_fail = True
-                log.error(traceback.format_exc())
-            finally:
+                log.warning(f'连不上eureka: {eureka_url}')
+                log.warning(traceback.format_exc())
                 break
+            time.sleep(eureka_heart)
+            continue
         if not stop:
             atexit.unregister(deregister)
+            log.info("%s s 后重新注册 eureka" % eureka_restart_time)
+            time.sleep(eureka_restart_time)
             register_eureka()
 
     try:
         eureka.register()
         atexit.register(deregister)
+        heart_thread = threading.Thread(target=heart, daemon=True)
+        heart_thread.start()
     except:
+        log.error("注册eureka失败")
         log.error(traceback.format_exc())
+        log.info("%s s 后重新注册 eureka" % eureka_restart_time)
+        time.sleep(eureka_restart_time)
         register_eureka()
-        return
-    heart_thread = threading.Thread(target=heart, daemon=True)
-    heart_thread.start()
 
 
 def get_app_homepage(name, **kwargs):
