@@ -11,7 +11,7 @@ with open('requirements.txt', mode='w', encoding='utf-8') as f:
 
 setup(
     name='py_bootstrap',
-    version='0.0.13',
+    version='0.0.15',
     description=(
         'python端启动器'
     ),
