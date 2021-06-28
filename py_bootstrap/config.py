@@ -9,7 +9,6 @@ import time
 import traceback
 import sys
 from importlib import import_module
-
 import requests
 from qg_eureka import EurekaClient
 from qg_tool.tool import get_host_ip
@@ -79,10 +78,9 @@ def register_eureka():
                     log.info("eureka连接恢复")
                     is_fail = False
                 log.debug('eureka renew')
-            except:
+            except Exception as e:
                 is_fail = True
-                log.warning(f'连不上eureka: {eureka_url}')
-                log.warning(traceback.format_exc())
+                log.error(f'连不上eureka: {eureka_url}', exc_info=e)
                 break
             time.sleep(eureka_heart)
             continue
@@ -97,9 +95,8 @@ def register_eureka():
         atexit.register(deregister)
         heart_thread = threading.Thread(target=heart, daemon=True)
         heart_thread.start()
-    except:
-        log.error("注册eureka失败")
-        log.error(traceback.format_exc())
+    except Exception as e:
+        log.error("注册eureka失败", exc_info=e)
         log.info("%s s 后重新注册 eureka" % eureka_restart_time)
         time.sleep(eureka_restart_time)
         register_eureka()
